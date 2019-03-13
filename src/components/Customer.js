@@ -1,6 +1,26 @@
 import React from 'react';
 
-class Customer extends React.Component {
+//Material UI를 사용하기 위해
+import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
+
+class Customer extends React.Component
+{
+    render() {
+        return (
+            <TableRow>
+                <TableCell>{this.props.id}</TableCell>
+                <TableCell><img src={this.props.image} alt="pfofile"/></TableCell>
+                <TableCell>{this.props.name}</TableCell>
+                <TableCell>{this.props.birthday}</TableCell>
+                <TableCell>{this.props.gender}</TableCell>
+                <TableCell>{this.props.job}</TableCell>
+            </TableRow>
+        );
+    }
+}
+
+class CustomerBack extends React.Component {
     render() {
         return(
             /*
