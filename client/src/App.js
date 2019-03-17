@@ -8,6 +8,7 @@ import TableHead from '@material-ui/core/TableHead'
 import TableBody from '@material-ui/core/TableBody'
 import TableRow from '@material-ui/core/TableRow'
 import TableCell from '@material-ui/core/TableCell'
+import CircularProgress from '@material-ui/core/CircularProgress'
 import { withStyles } from '@material-ui/core/styles'
 
 
@@ -21,6 +22,9 @@ const styles = theme => ({
   },
   table: {
     minWidth: 1080
+  },
+  progress:{
+    margin:theme.spacing.unit * 2
   }
 })
 
@@ -58,7 +62,8 @@ class App extends Component {
   //state는 변경되는 데이터를 처리
 
   state = {
-    customers:""
+    customers:"",
+    completed:0
   }
 
 
@@ -66,12 +71,16 @@ class App extends Component {
   //react Component는 라이프 싸이클이 존재하는데
   //react에서 컴포넌트가 모두 마운트가 되어졌을때 호출된다
   componentDidMount() {
+    //0.02초 간격으로 프로그래스 갱신
+    this.timer = setInterval(this.progress, 20);
+
+    //프로그래스 바 Test를 위해서는 callApi를 주석으로 막으면 된다
     this.callApi()
     //callApi를 호출해서 반환된 리턴값을 res로 받아서 customers에 셋팅
     .then(res => this.setState({customers: res}))
-
     //에러가 발생시 콘솔창에 에러를 출력
     .catch(err => console.log(err));
+
   }
 
   //비동기 통신 처리
@@ -81,6 +90,12 @@ class App extends Component {
     const response = await fetch('/api/customers');
     const body = await response.json();
     return body;
+  }
+
+  //프로그래스 바 애니메이션
+  progress = () => {
+    const { completed } = this.state;
+    this.setState({completed:completed >= 100 ? 0 : completed + 1});
   }
 
   render() {
@@ -114,7 +129,12 @@ class App extends Component {
                 job={c.job}
                 />
               );
-            }) : ""
+            }) : 
+            <TableRow>
+              <TableCell colSpan="6" align="center">
+                <CircularProgress className={classes.progress} variant="determinate" value={this.state.completed} />
+              </TableCell>
+            </TableRow>
         }
           </TableBody>
         </Table>
