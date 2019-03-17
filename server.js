@@ -1,3 +1,5 @@
+//File에 접근할 수 있는 라이브러리
+const fs = require('fs'); 
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
@@ -8,6 +10,26 @@ const port = process.env.port || 5000
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
+//DB설정파일을 로드
+const data = fs.readFileSync('./database.json');
+
+//DB설정구분을 파싱
+const conf = JSON.parse(data);
+
+//Mysql라이브러리 로드
+const mysql = require('mysql');
+
+//DB 커넥션 연결  객체 초기화
+const connection = mysql.createConnection({
+    host: conf.host,
+    user: conf.user,
+    password: conf.password,
+    port: conf.port,
+    database: conf.database
+});
+
+connection.connect();
+
 app.get('/api/hello',(req,res) => {
     res.send({message: 'Hello Express!'});
 });
@@ -16,6 +38,7 @@ app.get('/api/hello',(req,res) => {
 //서버단 모듈에서 가지고 있고
 //클라이언트 요청시 반환하는게 일반적인 프로그램임
 app.get('/api/customers',(req,res) => {
+    /*
     res.send([
         {
             'id':1,
@@ -42,6 +65,14 @@ app.get('/api/customers',(req,res) => {
             'job':'중학생'
           }
     ]);
+    */
+
+    connection.query(
+        "select * from CUSTOMER",
+        (err,rows,fields) => {
+            res.send(rows);
+        }
+    );
 });
 
 app.listen(port, () => console.log(`Listengin on port ${port}`));
