@@ -52,6 +52,37 @@ const customers = [
 ]
 
 class App extends Component {
+
+  //고객정보를 동적으로 처리
+  //props는 변경되지 않는 데이터를 처리
+  //state는 변경되는 데이터를 처리
+
+  state = {
+    customers:""
+  }
+
+
+  //api서버에서 데이터를 받아오는 처리
+  //react Component는 라이프 싸이클이 존재하는데
+  //react에서 컴포넌트가 모두 마운트가 되어졌을때 호출된다
+  componentDidMount() {
+    this.callApi()
+    //callApi를 호출해서 반환된 리턴값을 res로 받아서 customers에 셋팅
+    .then(res => this.setState({customers: res}))
+
+    //에러가 발생시 콘솔창에 에러를 출력
+    .catch(err => console.log(err));
+  }
+
+  //비동기 통신 처리
+  //서버 재기동 필요
+  //yarn dev
+  callApi = async () => {
+    const response = await fetch('/api/customers');
+    const body = await response.json();
+    return body;
+  }
+
   render() {
     const { classes } = this.props;
     return (
@@ -69,7 +100,9 @@ class App extends Component {
           </TableHead>
           <TableBody>
           {
-            customers.map(c=> {
+            //고객의 데이터가 있는경우만 출력
+            this.state.customers ?
+            this.state.customers.map(c=> {
               return (
                 <Customer
                 key={c.id}
@@ -81,7 +114,7 @@ class App extends Component {
                 job={c.job}
                 />
               );
-            })
+            }) : ""
         }
           </TableBody>
         </Table>
