@@ -30,6 +30,12 @@ const connection = mysql.createConnection({
 
 connection.connect();
 
+//파일 처리를 위한 multer객체
+const multer = require('multer');
+
+//사용자가 업로드한  파일이 저장되는곳
+const upload = multer({dest:'./upload'})
+
 app.get('/api/hello',(req,res) => {
     res.send({message: 'Hello Express!'});
 });
@@ -38,6 +44,7 @@ app.get('/api/hello',(req,res) => {
 //서버단 모듈에서 가지고 있고
 //클라이언트 요청시 반환하는게 일반적인 프로그램임
 app.get('/api/customers',(req,res) => {
+    console.log('get....');
     /*
     res.send([
         {
@@ -75,4 +82,39 @@ app.get('/api/customers',(req,res) => {
     );
 });
 
+//사용자가 업로드 폴더 참조
+//이미지 폴더에서 사용자 업로드와 매핑
+app.use('/image', express.static('./upload'));
+
+app.post('/api/customers', upload.single('image'), (req, res) => {
+    console.log('post....');
+
+    let sql = 'INSERT INTO CUSTOMER VALUES (null, ?, ?, ?, ?, ?)';
+ 
+    //multer라이브러리가 filename이 중복되지 않게 지정해 주어 서버에 저장이 된다
+    let image = '';
+    req.file ? image = '/image/' + req.file.filename : '';
+    let name = req.body.name;
+    let birthday = req.body.birthday;
+    let gender = req.body.gender;
+    let job = req.body.job;
+    let params = [image, name, birthday, gender, job];
+
+    //Debug
+    console.log(name);
+    console.log(image);
+    console.log(birthday);
+    console.log(gender);
+    console.log(job);
+
+    connection.query(sql, params,
+    (err, rows, fields) => {
+        res.send(rows);
+
+        console.log(err);
+        console.log(rows);
+    })
+});
+
 app.listen(port, () => console.log(`Listengin on port ${port}`));
+
