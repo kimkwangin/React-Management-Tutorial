@@ -30,32 +30,7 @@ const styles = theme => ({
 })
 
 const customers = [
-  /*
-  {
-    'id':1,
-    'image':'https://placeimg.com/64/64/1',
-    'name':'족발',
-    'birthday':'961222',
-    'gender':'남자',
-    'job':'직장인'
-  },
-  {
-    'id':2,
-    'image':'https://placeimg.com/64/64/2',
-    'name':'문어발',
-    'birthday':'971121',
-    'gender':'남자',
-    'job':'대학생'
-  },
-  {
-    'id':3,
-    'image':'https://placeimg.com/64/64/3',
-    'name':'오리발',
-    'birthday':'950212',
-    'gender':'여자',
-    'job':'중학생'
-  }
-  */
+  
 ]
 
 class App extends Component {
@@ -63,13 +38,6 @@ class App extends Component {
   //고객정보를 동적으로 처리
   //props는 변경되지 않는 데이터를 처리
   //state는 변경되는 데이터를 처리
-
-  /*
-  state = {
-    customers:"",
-    completed:0
-  }
-  */
  constructor(props)  {
    super(props);
    this.state = {
@@ -139,6 +107,7 @@ class App extends Component {
                 <TableCell>생년월일</TableCell>
                 <TableCell>성별</TableCell>
                 <TableCell>직업</TableCell>
+                <TableCell>설정</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -148,6 +117,7 @@ class App extends Component {
               this.state.customers.map(c=> {
                 return (
                   <Customer
+                  stateRefresh={this.stateRefresh}
                   key={c.id}
                   id={c.id}
                   image={c.image}

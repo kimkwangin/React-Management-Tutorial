@@ -1,3 +1,11 @@
+/*
+ * DB 테이블 정보 수정
+ * USE management;
+ * ALTER TABLE CUSTOMER ADD createdDate DATETIME;
+ * ALTER TABLE CUSTOMER ADD isDeleted INT;
+ * 출처: https://ndb796.tistory.com/230?category=1030599 [안경잡이개발자]
+ * */
+
 //File에 접근할 수 있는 라이브러리
 const fs = require('fs'); 
 const express = require('express');
@@ -45,37 +53,9 @@ app.get('/api/hello',(req,res) => {
 //클라이언트 요청시 반환하는게 일반적인 프로그램임
 app.get('/api/customers',(req,res) => {
     console.log('get....');
-    /*
-    res.send([
-        {
-            'id':1,
-            'image':'https://placeimg.com/64/64/1',
-            'name':'족발',
-            'birthday':'961222',
-            'gender':'남자',
-            'job':'직장인'
-          },
-          {
-            'id':2,
-            'image':'https://placeimg.com/64/64/2',
-            'name':'문어발',
-            'birthday':'971121',
-            'gender':'남자',
-            'job':'대학생'
-          },
-          {
-            'id':3,
-            'image':'https://placeimg.com/64/64/3',
-            'name':'오리발',
-            'birthday':'950212',
-            'gender':'여자',
-            'job':'중학생'
-          }
-    ]);
-    */
 
     connection.query(
-        "select * from CUSTOMER",
+        "select * from CUSTOMER where isDeleted = 0",
         (err,rows,fields) => {
             res.send(rows);
         }
@@ -89,7 +69,7 @@ app.use('/image', express.static('./upload'));
 app.post('/api/customers', upload.single('image'), (req, res) => {
     console.log('post....');
 
-    let sql = 'INSERT INTO CUSTOMER VALUES (null, ?, ?, ?, ?, ?)';
+    let sql = 'INSERT INTO CUSTOMER VALUES (null, ?, ?, ?, ?, ?, now(), 0)';
  
     //multer라이브러리가 filename이 중복되지 않게 지정해 주어 서버에 저장이 된다
     let image = '';
@@ -114,6 +94,17 @@ app.post('/api/customers', upload.single('image'), (req, res) => {
         console.log(err);
         console.log(rows);
     })
+});
+
+app.delete('/api/customers/:id', (req, res) => {
+    let sql = 'update CUSTOMER set isDeleted  = 1 where id = ?';
+    //id 파라메터 선택
+    let params = [req.params.id];
+    connection.query(sql, params,
+        (err,rows,fields) => {
+            res.send(rows);
+        }
+    )
 });
 
 app.listen(port, () => console.log(`Listengin on port ${port}`));
